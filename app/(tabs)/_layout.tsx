@@ -1,8 +1,9 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
-import { Pressable, useColorScheme } from 'react-native';
+import { Pressable, useColorScheme, View, Text, StyleSheet } from 'react-native';
 
 import Colors from '../../constants/Colors';
+import useCartStore from '../../store/store';
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -16,6 +17,24 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { items } = useCartStore();
+
+  const CartButton = () => {
+    return (
+      <Link href="/modal" asChild>
+        <Pressable style={{ marginRight: 15 }}>
+          <FontAwesome
+            name="shopping-cart"
+            size={20}
+            color={Colors[colorScheme ?? 'light'].text}
+          />
+          <View style={styles.countContainer}>
+            <Text style={styles.countText}>{items()}</Text>
+          </View>
+        </Pressable>
+      </Link>
+    );
+  }
 
   return (
     <Tabs
@@ -25,31 +44,29 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+          title: 'Shop',
+          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-bag" color={color} />,
+          headerRight: () => <CartButton />,
         }}
       />
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Shopping Cart',
+          tabBarIcon: ({ color }) => <TabBarIcon name="shopping-cart" color={color} />,
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  countContainer: {
+    position: 'absolute',
+    right: -5,
+    top: -5,
+  },
+  countText: {
+    color: 'red'
+  }
+});
